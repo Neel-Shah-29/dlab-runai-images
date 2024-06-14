@@ -1,14 +1,3 @@
-lightning
-nltk
-transformer_lens
-tokenizers
-torchdata
-lightning-bolts
-pytorch-ignite
-loguru
-hydra-core
-nnsight
-datasets==2.18.0
-peft==0.10.0
-bitsandbytes==0.43.1
-plotly
+Flask==2.2.2
+torch==2.2.2
+transformers==4.32.1

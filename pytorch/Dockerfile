@@ -1,18 +1,26 @@
-ARG BASE_IMAGE="ghcr.io/jkminder/dlab-runai-images/base:master"
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim
 
-FROM ${BASE_IMAGE}
+# Set the working directory in the container
+WORKDIR /app
 
-# install conda environment
-COPY pytorch/environment.yml /tmp/environment.yml
-COPY pytorch/requirements.txt /tmp/requirements.txt
-RUN /opt/conda/bin/mamba env create -f /tmp/environment.yml -n default && \
-    /opt/conda/bin/mamba clean -y --all
-RUN rm /tmp/environment.yml
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-# install requirements
-RUN . /opt/conda/etc/profile.d/conda.sh && \
-    conda activate default && \
-    mamba clean -y --all && \
-    pip install -r /tmp/requirements.txt --no-cache-dir &&\
-    rm /tmp/requirements.txt && \
-    chmod -R 777 /opt/conda/envs/default
+# Install any needed packages specified in requirements.txt
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# Add the model weights
+COPY dlabscratch/public/llmweights/llama3 /app/weights
+
+# Set environment variables for Flask
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_RUN_PORT=80
+
+# Expose the port
+EXPOSE 80
+
+# Run the application
+CMD ["flask", "run"]
